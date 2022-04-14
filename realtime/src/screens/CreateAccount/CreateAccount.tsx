@@ -1,0 +1,83 @@
+import React, {
+  useState,
+  useEffect
+} from 'react'
+import {
+  View,
+  Text,
+  Pressable
+} from 'react-native'
+import { supabase } from '../../supabase/supabase'
+import { useNavigation } from '@react-navigation/native'
+import { AuthScreensParams } from '../../routes/AuthRoute'
+import { SignUpResponse } from '../../types/supabaseResponse'
+import { Container, Form, Title } from '../../components/components'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+
+type CreateAccountScreenProp = NativeStackNavigationProp<AuthScreensParams, 'CreateAccount'>
+
+export const CreateAccount = () => {
+  const navigation = useNavigation<CreateAccountScreenProp>()
+  const [response, setResponse] = useState<SignUpResponse>()
+
+  function handleSignIn(email: string, password: string) {
+    (async () => {
+      const { error, session, user } = await supabase.auth.signUp({ email, password })
+
+      setResponse({ error, session, user })
+    })()
+  }
+
+  useEffect(() => {
+    (
+      async () => {
+        const id = await AsyncStorage.getItem('uuid')
+
+        if (id) {
+          navigation.navigate('Home')
+        }
+      }
+    )()
+  }, [])
+
+  useEffect(() => {
+    if (response?.user) {
+      navigation.navigate('Login')
+    }
+  }, [response])
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: '#0f0131',
+        alignItems: 'center',
+      }}
+    >
+      <Container>
+        <Title title='Create Account' />
+        <Form onAction={handleSignIn} buttonText='Create Account' />
+        <Pressable
+          style={{
+            // backgroundColor: '#1a0057',
+            // borderColor: 'white',
+            // borderWidth: 1,
+            padding: 10,
+            margin: 5
+          }}
+          onPress={() => navigation.navigate('Login')}
+        >
+          <Text
+            style={{
+              color: 'white',
+              textAlign: 'center'
+            }}
+          >
+            Login
+          </Text>
+        </Pressable>
+      </Container>
+    </View>
+  )
+}
