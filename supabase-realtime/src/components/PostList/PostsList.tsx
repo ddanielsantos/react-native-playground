@@ -1,112 +1,71 @@
-import React, { useEffect, useState } from 'react'
+import React, {
+  useState, useEffect
+} from 'react'
+import {
+  View, FlatList, Text
+} from 'react-native'
+import { Post } from '../../types/Post'
+import { User } from '@supabase/supabase-js'
+import { PostCard } from '../PostCard/PostCard'
 import { supabase } from '../../supabase/supabase'
-import { View, FlatList, Text } from 'react-native'
-
-type Post = {
-  id: string,
-  creator: string,
-  title: string,
-  body: string
-}
 
 export const PostsList = () => {
   const [posts, setPosts] = useState<Post[]>([])
-  const [, setFetching] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null)
 
-  const userId = supabase.auth.user()?.id
+  useEffect(() => {
+    let isActive = true
 
-  const fetchPosts = async () => {
-    setFetching(true)
+    setUser(supabase.auth.user())
 
-    const { data, error } = await supabase.from('posts').select('*')
+    const fetchData = async () => {
+      try {
+        const { data: fetchedPosts } = await supabase.from('posts').select('*')
 
-    if (!error) {
-      setPosts(data.reverse())
+        if (isActive && fetchedPosts) {
+          setPosts(fetchedPosts)
+          setIsLoading(false)
+        }
+      } catch (e) {
+        // TODO: Handle error
+      }
     }
 
-    setFetching(false)
-  }
+    fetchData();
 
-  useEffect(() => {
-    fetchPosts()
-  }, [])
-
-  useEffect(() => {
-    supabase
-      .from('posts')
-      .on('INSERT', payload => {
-        const { new: newPost } = payload as unknown as { new: Post }
-
-        setPosts(posts => [newPost, ...posts])
-      })
-      .subscribe()
-  }, [])
+    return () => {
+      isActive = false
+    }
+  }, [user])
 
   return (
     <View
       style={{
-        flex: 1
+        flex: 1,
+        justifyContent: 'center'
       }}
     >
-      <FlatList
-        data={posts}
-        keyExtractor={a => a.id}
-        ItemSeparatorComponent={() => <View style={{ marginVertical: 2 }} />}
-        renderItem={
-          ({ item }) => {
-            return (
-              <View
-                key={item.id}
-                style={{
-                  backgroundColor: '#1a0057',
-                  padding: 10,
-                  borderRadius: 4,
-                  marginHorizontal: 5
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: 'white',
-                      fontStyle: 'italic'
-                    }}
-                  >
-                    {item.title}
-                  </Text>
-
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      textAlign: 'right',
-                      color: 'white',
-                      marginLeft: 10,
-                      opacity: 0.5
-                    }}
-                  >
-                    {item.creator === userId ? 'You' : 'Someone else'}
-                  </Text>
-                </View>
-
-                <Text
-                  style={{
-                    color: 'white',
-                    marginTop: 10
-                  }}
-                >
-                  {item.body}
-                </Text>
-              </View>
-            )
-          }
-        }
-      />
+      {
+        isLoading ? (
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 20,
+              color: 'white'
+            }}
+          >Loading...</Text>
+        ) : (
+          <FlatList
+            data={posts}
+            keyExtractor={a => String(a.id)}
+            ItemSeparatorComponent={() => <View style={{ marginVertical: 2 }} />}
+            renderItem={
+              ({ item }) => <PostCard {...item} />
+            }
+          />
+        )
+      }
 
     </View>
   )
