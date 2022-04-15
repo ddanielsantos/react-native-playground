@@ -1,15 +1,17 @@
 import { Form } from "./Form/Form"
-import { Container } from "./Container/Container"
 import { Title } from "./Title/Title"
-import { TextInput } from "./TextInput/TextInput"
-import { PostsList } from "./PostList/PostsList"
+import { PostCard } from "./PostCard/PostCard"
 import { PostForm } from "./PostForm/PostForm"
+import { PostsList } from "./PostList/PostsList"
+import { TextInput } from "./TextInput/TextInput"
+import { Container } from "./Container/Container"
 
 export {
   Form,
   Title,
-  TextInput,
+  PostCard,
+  PostForm,
   PostsList,
-  Container,
-  PostForm as PostCreator
+  TextInput,
+  Container
 }

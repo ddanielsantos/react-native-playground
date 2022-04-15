@@ -10,8 +10,6 @@ export const Container = (props: Props) => {
     <View
       style={{
         flex: 1,
-        // borderColor: 'black',
-        // borderWidth: 1,
         justifyContent: 'center',
         width: '100%',
         maxWidth: 600
