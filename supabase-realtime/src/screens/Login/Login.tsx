@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import {
-  View,
-  Pressable,
-  Text
-} from 'react-native'
+import React, {
+  useState, useEffect, useContext
+} from 'react'
+import { View, Pressable, Text } from 'react-native'
 import { supabase } from '../../supabase/supabase'
+import { AuthContext } from '../../routes/AuthRoute'
 import { useNavigation } from '@react-navigation/native'
 import { AuthScreensParams } from '../../routes/AuthRoute'
-import { SignUpResponse } from '../../types/supabaseResponse'
+import { SignResponse } from '../../types/supabaseResponse'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Container, Form, Title } from '../../components/components'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -15,8 +14,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 type LoginScreenProp = NativeStackNavigationProp<AuthScreensParams, 'Login'>
 
 export const Login = () => {
+  const { setIsAuthenticated } = useContext(AuthContext)
   const navigation = useNavigation<LoginScreenProp>()
-  const [response, setResponse] = useState<SignUpResponse>()
+  const [response, setResponse] = useState<SignResponse>()
 
   function handleLogin(email: string, password: string) {
     (async () => {
@@ -29,23 +29,14 @@ export const Login = () => {
   useEffect(() => {
     (
       async () => {
-        const id = await AsyncStorage.getItem('uuid')
-
-        if (id) {
-          navigation.navigate('Home')
-        }
-      }
-    )()
-  }, [])
-
-  useEffect(() => {
-    (
-      async () => {
         if (response?.session?.user) {
           const { id } = response.session.user
 
           await AsyncStorage.setItem('uuid', id)
-          navigation.navigate('Home')
+
+          if (setIsAuthenticated) {
+            setIsAuthenticated(true)
+          }
         }
       }
     )()

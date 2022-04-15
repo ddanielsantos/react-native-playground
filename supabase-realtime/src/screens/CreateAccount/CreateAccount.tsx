@@ -10,16 +10,15 @@ import {
 import { supabase } from '../../supabase/supabase'
 import { useNavigation } from '@react-navigation/native'
 import { AuthScreensParams } from '../../routes/AuthRoute'
-import { SignUpResponse } from '../../types/supabaseResponse'
+import { SignResponse } from '../../types/supabaseResponse'
 import { Container, Form, Title } from '../../components/components'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 type CreateAccountScreenProp = NativeStackNavigationProp<AuthScreensParams, 'CreateAccount'>
 
 export const CreateAccount = () => {
   const navigation = useNavigation<CreateAccountScreenProp>()
-  const [response, setResponse] = useState<SignUpResponse>()
+  const [response, setResponse] = useState<SignResponse>()
 
   function handleSignIn(email: string, password: string) {
     (async () => {
@@ -28,18 +27,6 @@ export const CreateAccount = () => {
       setResponse({ error, session, user })
     })()
   }
-
-  useEffect(() => {
-    (
-      async () => {
-        const id = await AsyncStorage.getItem('uuid')
-
-        if (id) {
-          navigation.navigate('Home')
-        }
-      }
-    )()
-  }, [])
 
   useEffect(() => {
     if (response?.user) {

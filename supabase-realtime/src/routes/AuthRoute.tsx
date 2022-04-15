@@ -1,9 +1,13 @@
-import React from 'react'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-
+import React, {
+  useEffect, useState
+} from 'react'
+import AppLoading from 'expo-app-loading'
 import { Home } from '../screens/Home/Home'
 import { Login } from '../screens/Login/Login'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CreateAccount } from '../screens/CreateAccount/CreateAccount'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+
 
 export type AuthScreensParams = {
   Login: undefined,
@@ -13,12 +17,54 @@ export type AuthScreensParams = {
 
 const AuthStack = createNativeStackNavigator<AuthScreensParams>()
 
+type AuthContextProperties = {
+  isAuthenticated: boolean,
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>> | null
+}
+
+export const AuthContext = React.createContext<AuthContextProperties>({
+  isAuthenticated: false,
+  setIsAuthenticated: null
+})
+
 export const AuthRoute = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true)
+      const session = await AsyncStorage.getItem('uuid')
+
+      if (session) {
+        setIsAuthenticated(true)
+      }
+      setIsLoading(false)
+    })()
+  }, [isAuthenticated])
+
+  if (isLoading) {
+    return (
+      <AppLoading />
+    )
+  }
+
   return (
-    <AuthStack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_left' }} initialRouteName='CreateAccount'>
-      <AuthStack.Screen name='CreateAccount' component={CreateAccount} />
-      <AuthStack.Screen name='Home' component={Home} />
-      <AuthStack.Screen name='Login' component={Login} />
-    </AuthStack.Navigator>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+      <AuthStack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_left' }}>
+        {
+          isAuthenticated ? (
+            <>
+              <AuthStack.Screen name='Home' component={Home} />
+            </>
+          )
+            :
+            <>
+              <AuthStack.Screen name='Login' component={Login} />
+              <AuthStack.Screen name='CreateAccount' component={CreateAccount} />
+            </>
+        }
+      </AuthStack.Navigator>
+    </AuthContext.Provider>
   )
 }
