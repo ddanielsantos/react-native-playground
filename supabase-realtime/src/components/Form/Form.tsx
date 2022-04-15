@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TextInput } from '../components'
+import { TextInput } from '../TextInput/TextInput'
 import { Pressable, View, Text } from 'react-native'
 
 type Props = {
@@ -17,6 +17,8 @@ export const Form = ({ onAction, buttonText }: Props) => {
       <TextInput
         placeholder='Insert your email'
         value={email}
+        keyboardType='email-address'
+        autoCapitalize='none'
         updater={setEmail}
       />
       <TextInput

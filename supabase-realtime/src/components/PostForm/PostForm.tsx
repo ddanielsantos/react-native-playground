@@ -13,27 +13,42 @@ export const PostForm = ({ onSubmit }: Props) => {
   return (
     <View
       style={{
-        backgroundColor: '#1a0057'
+        backgroundColor: '#0f0131'
       }}
     >
       <TextInput
         placeholder='Title'
         updater={setTitle}
+        returnKeyType='done'
         value={title}
       />
       <TextInput
         placeholder='Body'
         updater={setBody}
         value={body}
+        numberOfLines={5}
+        keyboardType='default'
+        returnKeyType='done'
+        multiline={true}
+        maxLength={240}
+        style={{
+          height: 75,
+          textAlignVertical: 'top'
+        }}
       />
       <Pressable
         style={{
-          backgroundColor: '#5eff5e',
+          backgroundColor: '#ffffff',
           padding: 20,
-          margin: 5,
+          margin: 2,
+          marginHorizontal: 4,
           borderRadius: 4
         }}
-        onPress={() => onSubmit(title, body)}
+        onPress={() => {
+          onSubmit(title, body)
+          setTitle('')
+          setBody('')
+        }}
       />
 
     </View>
