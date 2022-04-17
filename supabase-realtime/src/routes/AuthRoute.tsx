@@ -4,6 +4,7 @@ import React, {
 import AppLoading from 'expo-app-loading'
 import { Home } from '../screens/Home/Home'
 import { Login } from '../screens/Login/Login'
+import { AuthContext } from '../context/AuthContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CreateAccount } from '../screens/CreateAccount/CreateAccount'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -16,16 +17,6 @@ export type AuthScreensParams = {
 }
 
 const AuthStack = createNativeStackNavigator<AuthScreensParams>()
-
-type AuthContextProperties = {
-  isAuthenticated: boolean,
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>> | null
-}
-
-export const AuthContext = React.createContext<AuthContextProperties>({
-  isAuthenticated: false,
-  setIsAuthenticated: null
-})
 
 export const AuthRoute = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
