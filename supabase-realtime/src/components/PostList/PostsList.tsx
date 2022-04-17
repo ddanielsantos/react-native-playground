@@ -2,12 +2,13 @@ import React, {
   useState, useEffect
 } from 'react'
 import {
-  View, FlatList, Text
+  View, FlatList
 } from 'react-native'
 import { Post } from '../../types/Post'
 import { User } from '@supabase/supabase-js'
 import { PostCard } from '../PostCard/PostCard'
 import { supabase } from '../../supabase/supabase'
+import { FetchingFeedback } from '../FetchingFeedback/FetchingFeedback'
 
 export const PostsList = () => {
   const [posts, setPosts] = useState<Post[]>([])
@@ -24,16 +25,24 @@ export const PostsList = () => {
         const { data: fetchedPosts } = await supabase.from('posts').select('*')
 
         if (isActive && fetchedPosts) {
-          setPosts(fetchedPosts)
+          setPosts(fetchedPosts.reverse())
           setIsLoading(false)
         }
       } catch (e) {
-        // TODO: Handle error
+        // TODO: handle error
       }
     }
 
-    fetchData();
+    const setupSubscription = () => {
+      if (!isActive) return
 
+      supabase.from('posts').on('INSERT', payload => {
+        setPosts(posts => [payload.new, ...posts])
+      }).subscribe()
+    }
+
+    fetchData()
+    setupSubscription()
     return () => {
       isActive = false
     }
@@ -43,28 +52,24 @@ export const PostsList = () => {
     <View
       style={{
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        paddingHorizontal: 5
       }}
     >
       {
-        isLoading ? (
-          <Text
-            style={{
-              textAlign: 'center',
-              fontSize: 20,
-              color: 'white'
-            }}
-          >Loading...</Text>
-        ) : (
+        (
+          posts.length === 0 || isLoading
+        ) ?
+          // TODO: someday integrate this logic in a single component
+          <FetchingFeedback dataLenght={posts.length} isFetching={isLoading} />
+          :
           <FlatList
             data={posts}
-            keyExtractor={a => String(a.id)}
+            keyExtractor={a => a.id}
             ItemSeparatorComponent={() => <View style={{ marginVertical: 2 }} />}
             renderItem={
               ({ item }) => <PostCard {...item} />
-            }
-          />
-        )
+            } />
       }
 
     </View>
