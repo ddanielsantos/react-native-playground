@@ -3,7 +3,7 @@ import React, {
 } from 'react'
 import { View, Pressable, Text } from 'react-native'
 import { supabase } from '../../supabase/supabase'
-import { AuthContext } from '../../routes/AuthRoute'
+import { AuthContext } from '../../context/AuthContext'
 import { useNavigation } from '@react-navigation/native'
 import { AuthScreensParams } from '../../routes/AuthRoute'
 import { SignResponse } from '../../types/supabaseResponse'
@@ -43,34 +43,30 @@ export const Login = () => {
   }, [response])
 
   return (
-    <View
+    <Container
       style={{
-        flex: 1,
         backgroundColor: '#0f0131',
-        alignItems: 'center',
       }}
     >
-      <Container>
-        <Title title='Login' />
-        <Form onAction={handleLogin} buttonText='Login' />
-        <Pressable
+      <Title title='Login' />
+      <Form onAction={handleLogin} buttonText='Login' />
+      <Pressable
+        style={{
+          padding: 10,
+          margin: 5,
+          borderRadius: 4
+        }}
+        onPress={() => navigation.navigate('CreateAccount')}
+      >
+        <Text
           style={{
-            padding: 10,
-            margin: 5,
-            borderRadius: 4
+            color: 'white',
+            textAlign: 'center'
           }}
-          onPress={() => navigation.navigate('CreateAccount')}
         >
-          <Text
-            style={{
-              color: 'white',
-              textAlign: 'center'
-            }}
-          >
-            Create Account
-          </Text>
-        </Pressable>
-      </Container>
-    </View>
+          Create Account
+        </Text>
+      </Pressable>
+    </Container>
   )
 }

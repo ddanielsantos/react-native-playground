@@ -1,21 +1,28 @@
 import React from 'react'
-import { View } from 'react-native'
+import { View, ViewProps } from 'react-native'
 
-type Props = {
+type Props = ViewProps & {
   children: JSX.Element | JSX.Element[];
 }
 
 export const Container = (props: Props) => {
   return (
     <View
-      style={{
+      style={[{
         flex: 1,
-        justifyContent: 'center',
-        width: '100%',
-        maxWidth: 600
-      }}
+        alignItems: 'center',
+      }, props.style]}
     >
-      {props.children}
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          width: '100%',
+          maxWidth: 600
+        }}
+      >
+        {props.children}
+      </View>
     </View>
   )
 }
