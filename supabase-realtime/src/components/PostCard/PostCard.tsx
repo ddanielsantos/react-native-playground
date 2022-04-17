@@ -42,7 +42,7 @@ export const PostCard = (item: Post) => {
             opacity: 0.5
           }}
         >
-          {item.creator === userId ? 'You' : 'Someone else'}
+          {item.creator_id === userId ? 'You' : 'Someone else'}
         </Text>
       </View>
 
