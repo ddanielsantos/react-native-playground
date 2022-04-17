@@ -35,36 +35,29 @@ export const CreateAccount = () => {
   }, [response])
 
   return (
-    <View
+    <Container
       style={{
-        flex: 1,
         backgroundColor: '#0f0131',
-        alignItems: 'center',
       }}
     >
-      <Container>
-        <Title title='Create Account' />
-        <Form onAction={handleSignIn} buttonText='Create Account' />
-        <Pressable
+      <Title title='Create Account' />
+      <Form onAction={handleSignIn} buttonText='Create Account' />
+      <Pressable
+        style={{
+          padding: 10,
+          margin: 5
+        }}
+        onPress={() => navigation.navigate('Login')}
+      >
+        <Text
           style={{
-            // backgroundColor: '#1a0057',
-            // borderColor: 'white',
-            // borderWidth: 1,
-            padding: 10,
-            margin: 5
+            color: 'white',
+            textAlign: 'center'
           }}
-          onPress={() => navigation.navigate('Login')}
         >
-          <Text
-            style={{
-              color: 'white',
-              textAlign: 'center'
-            }}
-          >
-            Login
-          </Text>
-        </Pressable>
-      </Container>
-    </View>
+          Login
+        </Text>
+      </Pressable>
+    </Container>
   )
 }
