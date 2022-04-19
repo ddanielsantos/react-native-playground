@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { TextInput } from '../TextInput/TextInput'
-import { Pressable, View, Text } from 'react-native'
+import { Pressable, Text } from 'react-native'
 
 type Props = {
   onAction: (email: string, password: string) => void,
@@ -12,7 +12,7 @@ export const Form = ({ onAction, buttonText }: Props) => {
   const [password, setPassword] = useState('')
 
   return (
-    <View>
+    <>
 
       <TextInput
         placeholder='Insert your email'
@@ -30,7 +30,7 @@ export const Form = ({ onAction, buttonText }: Props) => {
       <Pressable
         style={{
           backgroundColor: '#ffffff',
-          padding: 10,
+          padding: 15,
           margin: 5,
           borderRadius: 4
         }}
@@ -45,7 +45,7 @@ export const Form = ({ onAction, buttonText }: Props) => {
           {buttonText}
         </Text>
       </Pressable>
-    </View>
+    </>
 
   )
 }
