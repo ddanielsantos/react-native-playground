@@ -11,8 +11,9 @@ export const FetchingFeedback = ({ dataLenght, isFetching }: Props) => {
     <Text
       style={{
         textAlign: 'center',
-        fontSize: 20,
-        color: 'white'
+        fontSize: 18,
+        color: 'white',
+        opacity: 0.5
       }}
     >
       {
