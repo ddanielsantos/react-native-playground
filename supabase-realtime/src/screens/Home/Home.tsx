@@ -1,13 +1,21 @@
 import React, {
-  useEffect, useContext, useState
+  useContext,
+  useEffect,
+  useState
 } from 'react'
-import { Pressable, View } from 'react-native'
+import {
+  Pressable,
+  View,
+  Text
+} from 'react-native'
 import { supabase } from '../../supabase/supabase'
 import { AuthContext } from '../../context/AuthContext'
 import { useNavigation } from '@react-navigation/native'
 import { AuthScreensParams } from '../../routes/AuthRoute'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useToast } from 'react-native-toast-notifications'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { removeSessionFromStorage } from '../../helpers/asyncStorageHelpers'
 import { Container, Title, PostsList, TextInput } from '../../components/components'
 
 type HomeScreenProp = NativeStackNavigationProp<AuthScreensParams, 'Home'>
@@ -17,39 +25,51 @@ export const Home = () => {
   const { addListener: addNavigationListener } = useNavigation<HomeScreenProp>()
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
+  const toast = useToast()
 
   const { id: userId } = supabase.auth.user() || { id: '' }
 
-  function handleNewPost() {
-    if (!title || !body) return
+  async function handleNewPost() {
+    if (!title || !body) {
+      toast.show('Please fill in all fields', {
+        duration: 2000,
+        animationType: 'slide-in',
+        animationDuration: 300,
+        swipeEnabled: true,
+        placement: 'top',
+        type: 'danger'
+      })
+      return
+    }
 
-    (
-      async () => {
-        const { error, data } = await supabase.from('posts').insert([
-          { title, body, creator_id: userId, public: true },
-        ])
+    const { error } = await supabase.from('posts').insert([
+      { title, body, creator_id: userId, is_public: true },
+    ])
 
-        // TODO: handle error
-        if (error) {
-          alert(error.message)
-        }
+    if (error) {
+      toast.show('Something went wrong', {
+        duration: 2000,
+        animationType: 'slide-in',
+        animationDuration: 300,
+        swipeEnabled: true,
+        placement: 'top',
+        type: 'danger'
+      })
+    }
 
-      }
-    )()
+    if (!error) {
+      setTitle('')
+      setBody('')
+    }
   }
 
-  function handleLogout() {
-    (
-      async () => {
-        await AsyncStorage.removeItem('uuid')
+  async function handleLogout() {
+    const { error } = await removeSessionFromStorage()
+    const { error: supabaseError } = await supabase.auth.signOut()
 
-        const { error } = await supabase.auth.signOut()
-
-        if (!error && setIsAuthenticated) {
-          setIsAuthenticated(false)
-        }
-      }
-    )()
+    if (!error && !supabaseError) {
+      setIsAuthenticated(false)
+    }
   }
 
   useEffect(() => {
@@ -74,14 +94,13 @@ export const Home = () => {
         <Title title='Home' />
         <Pressable
           style={{
-            backgroundColor: '#ff5858',
-            width: 20,
-            height: 25,
             margin: 10,
             borderRadius: 4
           }}
           onPress={() => handleLogout()}
-        />
+        >
+          <MaterialCommunityIcons name="logout" size={24} color="red" />
+        </Pressable>
 
       </View>
       <PostsList />
@@ -108,17 +127,21 @@ export const Home = () => {
       <Pressable
         style={{
           backgroundColor: 'white',
-          padding: 20,
+          padding: 15,
           margin: 2,
           marginHorizontal: 4,
           borderRadius: 4
         }}
-        onPress={() => {
-          handleNewPost()
-          setTitle('')
-          setBody('')
-        }}
-      />
+        onPress={() => handleNewPost()}
+      >
+        <Text
+          style={{
+            textAlign: 'center'
+          }}
+        >
+          Send Post
+        </Text>
+      </Pressable>
     </Container>
   )
 }
