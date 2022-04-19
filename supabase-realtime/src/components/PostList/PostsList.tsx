@@ -1,5 +1,6 @@
 import React, {
-  useState, useEffect
+  useState,
+  useEffect
 } from 'react'
 import {
   View, FlatList
@@ -9,16 +10,24 @@ import { User } from '@supabase/supabase-js'
 import { PostCard } from '../PostCard/PostCard'
 import { supabase } from '../../supabase/supabase'
 import { FetchingFeedback } from '../FetchingFeedback/FetchingFeedback'
+import { useToast } from 'react-native-toast-notifications'
 
 export const PostsList = () => {
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [user, setUser] = useState<User | null>(null)
+  const toast = useToast()
 
   useEffect(() => {
     let isActive = true
 
     setUser(supabase.auth.user())
+
+    const setupSubscription = () => {
+      supabase.from('posts').on('INSERT', payload => {
+        setPosts(posts => [payload.new, ...posts])
+      }).subscribe()
+    }
 
     const fetchData = async () => {
       try {
@@ -33,16 +42,25 @@ export const PostsList = () => {
       }
     }
 
-    const setupSubscription = () => {
-      if (!isActive) return
 
-      supabase.from('posts').on('INSERT', payload => {
-        setPosts(posts => [payload.new, ...posts])
-      }).subscribe()
-    }
 
     fetchData()
-    setupSubscription()
+    try {
+      if (isActive) setupSubscription()
+    } catch (e: any) {
+      // TODO: in the future, check if this error still happens due
+      // to react native's URL limitation
+      if (e.message !== 'Invalid URL: undefined') {
+        toast.show('Something went wrong', {
+          duration: 2000,
+          animationType: 'slide-in',
+          animationDuration: 300,
+          swipeEnabled: true,
+          placement: 'top',
+          type: 'danger'
+        })
+      }
+    }
     return () => {
       isActive = false
     }
