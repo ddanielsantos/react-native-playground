@@ -12,8 +12,7 @@ export const PostCard = (item: Post) => {
       style={{
         backgroundColor: '#1a0057',
         padding: 10,
-        borderRadius: 4,
-        // marginHorizontal: 5
+        borderRadius: 4
       }}
     >
       <View
