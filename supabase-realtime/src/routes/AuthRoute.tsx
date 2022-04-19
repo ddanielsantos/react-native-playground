@@ -1,12 +1,13 @@
 import React, {
-  useEffect, useState
+  useEffect,
+  useState
 } from 'react'
 import AppLoading from 'expo-app-loading'
 import { Home } from '../screens/Home/Home'
 import { Login } from '../screens/Login/Login'
 import { AuthContext } from '../context/AuthContext'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CreateAccount } from '../screens/CreateAccount/CreateAccount'
+import { getSessionFromStorage } from '../helpers/asyncStorageHelpers'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 
@@ -23,15 +24,18 @@ export const AuthRoute = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    (async () => {
-      setIsLoading(true)
-      const session = await AsyncStorage.getItem('uuid')
+    (
+      async () => {
+        setIsLoading(true)
+        const { session } = await getSessionFromStorage()
 
-      if (session) {
-        setIsAuthenticated(true)
+        if (session) {
+          setIsAuthenticated(true)
+        }
+
+        setIsLoading(false)
       }
-      setIsLoading(false)
-    })()
+    )()
   }, [isAuthenticated])
 
   if (isLoading) {
