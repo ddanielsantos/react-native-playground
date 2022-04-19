@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { View, ViewProps } from 'react-native'
 
 type Props = ViewProps & {
-  children: JSX.Element | JSX.Element[];
+  children: ReactNode
 }
 
 export const Container = (props: Props) => {
